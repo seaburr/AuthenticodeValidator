@@ -34,7 +34,7 @@ Function Find-FilesWithAuthenticodeIssues() {
         $exclusionFilter
     )
 
-    
+
 
 }
 
@@ -56,3 +56,28 @@ Write-host "Files with timestamping issues:"
 Write-Host $tester.filesWithTimestampIssues
 Write-Host "File Count"
 Write-Host $tester.fileCount
+
+
+
+
+# Ditch the class. What about useful functions instead?
+
+Function Get-ListOfFilesWithSignatureIssues() {
+    param (
+        [String] $rootDirectory,
+        [String[]] $includeFilter,
+        [String[]] $excludeFilter
+    )
+    $files = Get-ChildItem -Path $rootDirectory -Include $includeFilter -Exclude $excludeFilter -Recurse -Force | ForEach-Object {Get-AuthenticodeSignature $_} | Where-Object {$_.Status -ne "Valid"}
+    Return $files
+}
+
+Function Get-ListOfFilesWithTimestampIssues() {
+    param (
+        [String] $rootDirectory,
+        [String[]] $includeFilter,
+        [String[]] $excludeFilter
+    )
+    $files = Get-ChildItem -Path $rootDirectory -Include $includeFilter -Exclude $excludeFilter -Recurse -Force | ForEach-Object {Get-AuthenticodeSignature $_} | Where-Object {$_.TimestamperCertificate -eq ""}
+    Return $files
+}
